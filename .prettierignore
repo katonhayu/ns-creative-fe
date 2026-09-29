@@ -1,0 +1,2 @@
+# Di-generate dari OpenAPI backend (npm run gen:api), jangan diformat manual.
+src/api/generated/

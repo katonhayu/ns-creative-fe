@@ -1,0 +1,237 @@
+/* ---------------------------------------------------------------------------
+   Token desain. Semua warna, radius, dan bayangan diambil dari sini supaya
+   tampilan konsisten dan mudah diganti (termasuk dark mode nanti).
+   --------------------------------------------------------------------------- */
+:root {
+  /* Netral */
+  --ns-bg: #f3f6fb;
+  --ns-surface: #ffffff;
+  --ns-surface-2: #f7f9fc;
+  --ns-border: #e4e9f2;
+  --ns-border-strong: #cfd7e4;
+  --ns-text: #141c2e;
+  --ns-text-2: #515d72;
+  --ns-text-3: #8a94a6;
+
+  /* Aksen (selaras dengan primary PrimeVue = blue) */
+  --ns-accent: #2563eb;
+  --ns-accent-strong: #1d4ed8;
+  --ns-accent-soft: #e8efff;
+  --ns-accent-text: #1d4ed8;
+
+  /* Sidebar navy */
+  --ns-side-bg: #18213d;
+  --ns-side-bg-2: #1d2848;
+  --ns-side-text: #b4bdd3;
+  --ns-side-text-strong: #ffffff;
+  --ns-side-muted: #6d789a;
+  --ns-side-border: rgba(255, 255, 255, 0.08);
+  --ns-side-hover: rgba(255, 255, 255, 0.06);
+  --ns-side-active: #2f6bff;
+  --ns-side-active-text: #ffffff;
+
+  /* Status */
+  --ns-danger: #d23f3f;
+  --ns-danger-soft: #fdecec;
+  --ns-warn: #b8731a;
+  --ns-warn-soft: #fff4e0;
+  --ns-success: #1e8f52;
+  --ns-success-soft: #e3f6ea;
+
+  /* Bentuk */
+  --ns-radius-sm: 8px;
+  --ns-radius: 12px;
+  --ns-radius-lg: 16px;
+  --ns-shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --ns-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 4px 14px -4px rgba(16, 24, 40, 0.08);
+  --ns-shadow-lg: 0 16px 40px -12px rgba(16, 24, 40, 0.22);
+
+  /* Tipografi */
+  --ns-font:
+    'Inter', 'Segoe UI Variable', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--ns-font);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ns-text);
+  background: var(--ns-bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.01em;
+}
+
+/* ---------------------------------------------------------------------------
+   Scrollbar tipis tanpa jalur, menyatu dengan latar. Warnanya diatur lewat
+   --ns-scroll-thumb supaya area gelap (sidebar) cukup menimpa variabelnya.
+   --------------------------------------------------------------------------- */
+:root {
+  --ns-scroll-thumb: rgba(100, 116, 139, 0.32);
+  --ns-scroll-thumb-hover: rgba(100, 116, 139, 0.55);
+}
+
+/* Firefox dan Chrome/Edge 121+ */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ns-scroll-thumb) transparent;
+}
+
+/* Safari dan Chrome lama */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ns-scroll-thumb);
+  background-clip: padding-box;
+  border: 3px solid transparent;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ns-scroll-thumb-hover);
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ns-accent);
+  outline-offset: 2px;
+}
+
+/* Angka rata kolom di tabel dan kartu statistik. */
+.angka {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------------------
+   Tabel data (DataTable dengan class="ns-tabel"): berbingkai tipis, header
+   abu-abu muda. Dipakai CrudTable dan tabel penugasan di detail event.
+   --------------------------------------------------------------------------- */
+.ns-tabel .p-datatable-table-container {
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-sm);
+}
+.ns-tabel .p-datatable-thead > tr > th {
+  padding: 0.75rem 1rem;
+  background: var(--ns-surface-2);
+  border-color: var(--ns-border);
+  color: var(--ns-text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.ns-tabel .p-datatable-tbody > tr > td,
+.ns-tabel .p-datatable-tfoot > tr > td {
+  padding: 0.85rem 1rem;
+  border-color: var(--ns-border);
+  color: var(--ns-text-2);
+  font-size: 0.85rem;
+}
+.ns-tabel .p-datatable-tbody > tr:last-child > td {
+  border-bottom: none;
+}
+.ns-tabel .p-datatable-tfoot > tr > td {
+  background: var(--ns-surface-2);
+  color: var(--ns-text);
+  font-weight: 600;
+  border-top: 1px solid var(--ns-border);
+}
+
+/* ---------------------------------------------------------------------------
+   Kelas bantu isi sel tabel (dipakai di kolom CrudTable semua modul).
+   --------------------------------------------------------------------------- */
+.sel-redup {
+  color: var(--ns-text-3);
+}
+.sel-tautan {
+  color: inherit;
+  text-decoration: none;
+}
+.sel-tautan:hover {
+  color: var(--ns-accent-text);
+  text-decoration: underline;
+}
+.sel-terpotong {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.sel-lencana {
+  display: inline-block;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  background: var(--ns-surface-2);
+  border: 1px solid var(--ns-border);
+  color: var(--ns-text-3);
+  font-size: 0.74rem;
+  font-weight: 500;
+}
+.sel-orang {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.sel-orang__avatar {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--ns-accent-soft);
+  color: var(--ns-accent-text);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+.sel-orang__nama {
+  font-weight: 600;
+  color: var(--ns-text);
+}
+
+/* Penyesuaian kecil pada komponen PrimeVue supaya menyatu dengan token di atas. */
+.p-component {
+  font-family: var(--ns-font);
+}
+.p-dialog {
+  border-radius: var(--ns-radius-lg);
+  box-shadow: var(--ns-shadow-lg);
+}
+.p-toast .p-toast-message {
+  border-radius: var(--ns-radius);
+  box-shadow: var(--ns-shadow-lg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
