@@ -1,4 +1,16 @@
 import { z } from 'zod'
+import { toTypedSchema } from '@vee-validate/zod'
+
+/**
+ * Pengganti toTypedSchema untuk useForm. Bawaan vee-validate memanggil `cast`
+ * (= zod parse lengkap dengan transform) setiap useForm/resetForm menerima
+ * nilai awal. Saat edit data yang valid, transform ikut jalan sehingga Date di
+ * form berubah jadi string "2026-12-18" dan DatePicker crash. Transform cukup
+ * dijalankan saat submit, jadi cast dimatikan.
+ */
+export function skemaForm<T extends z.ZodTypeAny>(skema: T) {
+  return { ...toTypedSchema(skema), cast: undefined }
+}
 
 /** Teks wajib diisi, dipangkas spasinya. */
 export const wajib = (pesan: string, maks = 100) =>

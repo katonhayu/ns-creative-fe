@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import dayjs from 'dayjs'
 import { useForm } from 'vee-validate'
-import { toTypedSchema } from '@vee-validate/zod'
+import { skemaForm } from '@/utils/schema'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import DatePicker from 'primevue/datepicker'
@@ -95,7 +95,7 @@ const FIELD_FORM = [
 ] as const
 
 const { defineField, errors, handleSubmit, resetForm, setErrors } = useForm({
-  validationSchema: toTypedSchema(eventSchema),
+  validationSchema: skemaForm(eventSchema),
   initialValues: nilaiAwal(null),
 })
 

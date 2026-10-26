@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useForm } from 'vee-validate'
-import { toTypedSchema } from '@vee-validate/zod'
+import { skemaForm } from '@/utils/schema'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import FormDialog from '@/components/FormDialog.vue'
@@ -36,7 +36,7 @@ function nilaiAwal(v: Vendor | null): VendorFormValues {
 const FIELD_FORM = ['nama', 'jenisJasa', 'contactPerson', 'telepon'] as const
 
 const { defineField, errors, handleSubmit, resetForm, setErrors } = useForm({
-  validationSchema: toTypedSchema(vendorSchema),
+  validationSchema: skemaForm(vendorSchema),
   initialValues: nilaiAwal(null),
 })
 

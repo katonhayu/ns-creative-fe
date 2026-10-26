@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useForm } from 'vee-validate'
-import { toTypedSchema } from '@vee-validate/zod'
+import { skemaForm } from '@/utils/schema'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Select from 'primevue/select'
@@ -47,7 +47,7 @@ const FIELD_FORM = [
 ] as const
 
 const { defineField, errors, handleSubmit, resetForm, setErrors } = useForm({
-  validationSchema: toTypedSchema(budgetSchema),
+  validationSchema: skemaForm(budgetSchema),
   initialValues: nilaiAwal(null),
 })
 

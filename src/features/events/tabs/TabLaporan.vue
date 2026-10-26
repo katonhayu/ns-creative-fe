@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useForm } from 'vee-validate'
-import { toTypedSchema } from '@vee-validate/zod'
+import { skemaForm } from '@/utils/schema'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useToast } from 'primevue/usetoast'
 import Button from 'primevue/button'
@@ -84,7 +84,7 @@ function nilaiAwal(l: Laporan | null): LaporanFormValues {
 const FIELD_FORM = ['hasilPelaksanaan', 'evaluasi', 'kendala', 'catatan'] as const
 
 const { defineField, errors, handleSubmit, resetForm, setErrors, meta } = useForm({
-  validationSchema: toTypedSchema(laporanSchema),
+  validationSchema: skemaForm(laporanSchema),
   initialValues: nilaiAwal(null),
 })
 

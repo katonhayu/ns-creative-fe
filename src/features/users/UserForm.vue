@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useForm } from 'vee-validate'
-import { toTypedSchema } from '@vee-validate/zod'
+import { skemaForm } from '@/utils/schema'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Select from 'primevue/select'
@@ -39,7 +39,7 @@ function nilaiAwal(u: User | null): UserFormValues {
 const FIELD_FORM = ['nama', 'email', 'role', 'isAktif', 'password'] as const
 
 const { defineField, errors, handleSubmit, resetForm, setErrors } = useForm({
-  validationSchema: computed(() => toTypedSchema(userSchema(modeEdit.value))),
+  validationSchema: computed(() => skemaForm(userSchema(modeEdit.value))),
   initialValues: nilaiAwal(null),
 })
 

@@ -2,7 +2,7 @@
 import { ref, watch } from 'vue'
 import dayjs from 'dayjs'
 import { useForm } from 'vee-validate'
-import { toTypedSchema } from '@vee-validate/zod'
+import { skemaForm } from '@/utils/schema'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import DatePicker from 'primevue/datepicker'
@@ -35,7 +35,7 @@ function nilaiAwal(d: Dokumen | null): DokumenFormValues {
 const FIELD_FORM = ['namaDokumen', 'jenis', 'tanggal', 'keterangan'] as const
 
 const { defineField, errors, handleSubmit, resetForm, setErrors } = useForm({
-  validationSchema: toTypedSchema(dokumenSchema),
+  validationSchema: skemaForm(dokumenSchema),
   initialValues: nilaiAwal(null),
 })
 

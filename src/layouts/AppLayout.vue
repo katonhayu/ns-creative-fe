@@ -167,7 +167,7 @@ async function keluar() {
     </div>
 
     <div class="tirai" @click="sidebarTerbuka = false" />
-    <Toast position="bottom-right" />
+    <Toast position="top-right" />
     <ConfirmDialog />
   </div>
 </template>

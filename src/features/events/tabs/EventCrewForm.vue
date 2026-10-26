@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import dayjs from 'dayjs'
 import { useForm } from 'vee-validate'
-import { toTypedSchema } from '@vee-validate/zod'
+import { skemaForm } from '@/utils/schema'
 import { useQuery } from '@tanstack/vue-query'
 import { usePilihan } from '@/composables/usePilihan'
 import Select from 'primevue/select'
@@ -64,7 +64,7 @@ function nilaiAwal(p: EventCrew | null): EventCrewFormValues {
 const FIELD_FORM = ['crewId', 'posisi', 'tanggalBertugas'] as const
 
 const { defineField, errors, handleSubmit, resetForm, setErrors } = useForm({
-  validationSchema: computed(() => toTypedSchema(eventCrewSchema(props.event))),
+  validationSchema: computed(() => skemaForm(eventCrewSchema(props.event))),
   initialValues: nilaiAwal(null),
 })
 

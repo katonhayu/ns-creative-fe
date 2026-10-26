@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import dayjs from 'dayjs'
 import { useForm } from 'vee-validate'
-import { toTypedSchema } from '@vee-validate/zod'
+import { skemaForm } from '@/utils/schema'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import DatePicker from 'primevue/datepicker'
@@ -56,7 +56,7 @@ function nilaiAwal(t: TaskRow | null): TaskFormValues {
 const FIELD_FORM = ['namaTugas', 'picUserId', 'deadline', 'status', 'deskripsi', 'catatan'] as const
 
 const { defineField, errors, handleSubmit, resetForm, setErrors } = useForm({
-  validationSchema: toTypedSchema(taskSchema),
+  validationSchema: skemaForm(taskSchema),
   initialValues: nilaiAwal(null),
 })
 

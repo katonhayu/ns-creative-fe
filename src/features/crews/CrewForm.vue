@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useForm } from 'vee-validate'
-import { toTypedSchema } from '@vee-validate/zod'
+import { skemaForm } from '@/utils/schema'
 import { useQuery } from '@tanstack/vue-query'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
@@ -39,7 +39,7 @@ function nilaiAwal(c: CrewRow | null): CrewFormValues {
 const FIELD_FORM = ['userId', 'nama', 'telepon', 'keahlian'] as const
 
 const { defineField, errors, handleSubmit, resetForm, setErrors } = useForm({
-  validationSchema: toTypedSchema(crewSchema),
+  validationSchema: skemaForm(crewSchema),
   initialValues: nilaiAwal(null),
 })
 

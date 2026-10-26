@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import dayjs from 'dayjs'
 import { useForm } from 'vee-validate'
-import { toTypedSchema } from '@vee-validate/zod'
+import { skemaForm } from '@/utils/schema'
 import { useQuery } from '@tanstack/vue-query'
 import { usePilihan } from '@/composables/usePilihan'
 import InputNumber from 'primevue/inputnumber'
@@ -78,7 +78,7 @@ const FIELD_FORM = [
 ] as const
 
 const { defineField, errors, handleSubmit, resetForm, setErrors } = useForm({
-  validationSchema: computed(() => toTypedSchema(eventTalentSchema(props.event))),
+  validationSchema: computed(() => skemaForm(eventTalentSchema(props.event))),
   initialValues: nilaiAwal(null),
 })
 

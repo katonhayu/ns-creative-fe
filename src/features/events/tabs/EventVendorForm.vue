@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useForm } from 'vee-validate'
-import { toTypedSchema } from '@vee-validate/zod'
+import { skemaForm } from '@/utils/schema'
 import { useQuery } from '@tanstack/vue-query'
 import { usePilihan } from '@/composables/usePilihan'
 import InputText from 'primevue/inputtext'
@@ -56,7 +56,7 @@ function nilaiAwal(p: EventVendor | null): EventVendorFormValues {
 const FIELD_FORM = ['vendorId', 'kebutuhan', 'biaya', 'statusPembayaran'] as const
 
 const { defineField, errors, handleSubmit, resetForm, setErrors } = useForm({
-  validationSchema: toTypedSchema(eventVendorSchema),
+  validationSchema: skemaForm(eventVendorSchema),
   initialValues: nilaiAwal(null),
 })
 
