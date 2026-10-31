@@ -101,6 +101,7 @@ function konfirmasiHapus(c: EventCrew) {
     judul="Crew"
     deskripsi="Tim lapangan yang bertugas, per tanggal dan posisi."
     label-tambah="Tambah crew"
+    :tanpa-tambah="!event.bolehKelola"
     ikon-kosong="pi-users"
     pesan-kosong="Belum ada crew di event ini. Pilih dari master data crew."
     :is-pending="daftar.isPending.value"
@@ -140,7 +141,13 @@ function konfirmasiHapus(c: EventCrew) {
           <span class="angka">{{ tanggal(c.tanggalBertugas) }}</span>
         </template>
       </Column>
-      <Column header="Aksi" frozen align-frozen="right" style="width: 5.5rem">
+      <Column
+        v-if="event.bolehKelola"
+        header="Aksi"
+        frozen
+        align-frozen="right"
+        style="width: 5.5rem"
+      >
         <template #body="{ data: c }">
           <div class="aksi">
             <Button

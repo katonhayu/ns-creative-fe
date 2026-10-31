@@ -2,9 +2,12 @@
 import Column from 'primevue/column'
 import CrudTable from '@/components/CrudTable.vue'
 import { useCrud } from '@/composables/useCrud'
+import { useAuthStore } from '@/stores/auth'
 import { inisial, rupiah } from '@/utils/format'
 import { talentApi } from './talent.api'
 import TalentForm from './TalentForm.vue'
+
+const auth = useAuthStore()
 
 const crud = useCrud({
   key: 'talents',
@@ -21,6 +24,7 @@ const crud = useCrud({
   <div class="halaman">
     <CrudTable
       :crud="crud"
+      :hanya-lihat="!auth.isAdmin"
       judul="Data Talent"
       placeholder-cari="Cari nama talent atau jenis talent…"
       ikon-kosong="pi-star"

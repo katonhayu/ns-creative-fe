@@ -63,7 +63,7 @@ const jumlahEvent = computed(() => new Set(tampil.value.map((s) => s.eventId)).s
         <p>
           {{
             auth.peran === 'crew'
-              ? 'Rundown event tempat kamu bertugas. Sesi yang kamu pegang diberi tanda.'
+              ? 'Rundown event yang kamu pegang atau tempat kamu ditugaskan. Sesi yang kamu pegang diberi tanda.'
               : 'Rundown dari semua event yang bisa kamu akses. Ubah sesi dari tab Rundown di detail event.'
           }}
         </p>
@@ -118,18 +118,15 @@ const jumlahEvent = computed(() => new Set(tampil.value.map((s) => s.eventId)).s
         Tidak ada jadwal pada rentang ini.
         <Button label="Lihat semua jadwal" text size="small" @click="rentang = 'semua'" />
       </p>
-      <p v-else-if="auth.peran === 'crew'">Kamu belum ditugaskan di event mana pun.</p>
+      <p v-else-if="auth.peran === 'crew'">
+        Kamu belum memegang atau ditugaskan di event mana pun.
+      </p>
       <p v-else>Belum ada rundown di event yang bisa kamu akses.</p>
     </div>
 
     <template v-else>
       <p class="jumlah">{{ tampil.length }} sesi dari {{ jumlahEvent }} event</p>
-      <RundownList
-        :items="tampil"
-        tampilkan-event
-        :tautan-event="auth.peran !== 'crew'"
-        :sorot-user-id="auth.user?.id ?? null"
-      />
+      <RundownList :items="tampil" tampilkan-event :sorot-crew-id="auth.crewId" />
     </template>
   </section>
 </template>

@@ -173,6 +173,7 @@ const alasanTidakBisaHapus = (b: BudgetItem) =>
     judul="Budget"
     deskripsi="Estimasi, realisasi, dan pembayaran tiap pos anggaran. Fee talent dan biaya vendor tercatat otomatis."
     label-tambah="Tambah pos anggaran"
+    :tanpa-tambah="!event.bolehKelola"
     ikon-kosong="pi-wallet"
     pesan-kosong="Belum ada pos anggaran. Tambahkan pos manual seperti sewa venue, atau tugaskan talent dan vendor."
     :is-pending="daftar.isPending.value"
@@ -317,7 +318,7 @@ const alasanTidakBisaHapus = (b: BudgetItem) =>
             <StatusBadge :status="STATUS_PEMBAYARAN[b.statusPembayaran as StatusPembayaran]" />
           </template>
         </Column>
-        <Column header="Aksi" style="width: 5.5rem">
+        <Column v-if="event.bolehKelola" header="Aksi" style="width: 5.5rem">
           <template #body="{ data: b }">
             <div class="aksi">
               <Button
@@ -359,7 +360,7 @@ const alasanTidakBisaHapus = (b: BudgetItem) =>
               :footer-class="`kanan angka ${kelasSelisih(totalTampil.selisih)}`"
             />
             <Column :footer="rupiah(totalTampil.sponsorship)" footer-class="kanan angka" />
-            <Column :colspan="2" />
+            <Column :colspan="event.bolehKelola ? 2 : 1" />
           </Row>
         </ColumnGroup>
       </DataTable>

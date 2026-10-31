@@ -16,12 +16,16 @@ declare module 'vue-router' {
   }
 }
 
-const ADMIN_PIC: Peran[] = ['admin', 'pic']
+/**
+ * Data master dan pengguna: admin mengelola, event manager hanya melihat. Crew tidak membuka
+ * menunya; ia cukup memilih data master dari dropdown di form event.
+ * Halaman event, jadwal, task, dan laporan terbuka untuk semua peran: isinya disaring backend
+ * (crew hanya melihat event yang ia pegang atau tempat ia ditugaskan).
+ */
+const PEMANTAU: Peran[] = ['admin', 'event_manager']
 
-/** Halaman pertama setelah login, tergantung peran. */
-export function berandaUntuk(peran: Peran | null) {
-  return peran === 'crew' ? { name: 'schedules' } : { name: 'dashboard' }
-}
+/** Halaman pertama setelah login. Dashboard sudah disaring per pengguna oleh backend. */
+export const BERANDA = { name: 'dashboard' }
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -47,20 +51,20 @@ const router = createRouter({
           path: '',
           name: 'dashboard',
           component: () => import('@/features/dashboard/DashboardView.vue'),
-          meta: { judul: 'Dashboard', peran: ADMIN_PIC },
+          meta: { judul: 'Dashboard' },
         },
         {
           path: 'events',
           name: 'events',
           component: () => import('@/features/events/EventListView.vue'),
-          meta: { judul: 'Event', peran: ADMIN_PIC },
+          meta: { judul: 'Event' },
         },
         {
           path: 'events/:id',
           name: 'event-detail',
           component: () => import('@/features/events/EventDetailView.vue'),
           props: (route) => ({ id: String(route.params.id) }),
-          meta: { judul: 'Detail Event & Budgeting', peran: ADMIN_PIC, menu: 'events' },
+          meta: { judul: 'Detail Event & Budgeting', menu: 'events' },
         },
         {
           path: 'schedules',
@@ -78,37 +82,37 @@ const router = createRouter({
           path: 'reports',
           name: 'reports',
           component: () => import('@/features/reports/ReportListView.vue'),
-          meta: { judul: 'Laporan', peran: ADMIN_PIC },
+          meta: { judul: 'Laporan' },
         },
         {
           path: 'clients',
           name: 'clients',
           component: () => import('@/features/clients/ClientListView.vue'),
-          meta: { judul: 'Client', peran: ADMIN_PIC },
+          meta: { judul: 'Client', peran: PEMANTAU },
         },
         {
           path: 'talents',
           name: 'talents',
           component: () => import('@/features/talents/TalentListView.vue'),
-          meta: { judul: 'Talent', peran: ADMIN_PIC },
+          meta: { judul: 'Talent', peran: PEMANTAU },
         },
         {
           path: 'crews',
           name: 'crews',
           component: () => import('@/features/crews/CrewListView.vue'),
-          meta: { judul: 'Crew', peran: ADMIN_PIC },
+          meta: { judul: 'Crew', peran: PEMANTAU },
         },
         {
           path: 'vendors',
           name: 'vendors',
           component: () => import('@/features/vendors/VendorListView.vue'),
-          meta: { judul: 'Vendor', peran: ADMIN_PIC },
+          meta: { judul: 'Vendor', peran: PEMANTAU },
         },
         {
           path: 'users',
           name: 'users',
           component: () => import('@/features/users/UserListView.vue'),
-          meta: { judul: 'Pengguna', peran: ['admin'] },
+          meta: { judul: 'Pengguna', peran: PEMANTAU },
         },
       ],
     },
@@ -129,12 +133,12 @@ router.beforeEach((to) => {
   }
 
   if (to.name === 'login' && auth.sudahLogin) {
-    return berandaUntuk(auth.peran)
+    return BERANDA
   }
 
   // Hanya menyembunyikan halaman. Penegakan hak akses tetap di backend.
   if (to.meta.peran && (!auth.peran || !to.meta.peran.includes(auth.peran))) {
-    return berandaUntuk(auth.peran)
+    return BERANDA
   }
 
   return true

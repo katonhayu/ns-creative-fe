@@ -15,16 +15,21 @@ import {
 import type { TaskPayload } from '@/features/tasks/task.schema'
 import {
   STATUS_TASK,
+  bolehUbahStatus,
   lewatDeadline,
   type StatusTask,
   type TaskRow,
 } from '@/features/tasks/task.types'
 import TaskForm from '@/features/tasks/TaskForm.vue'
 import TaskTable from '@/features/tasks/TaskTable.vue'
+import { useAuthStore } from '@/stores/auth'
 import type { EventDetail } from '../event.types'
 import PanelTab from './PanelTab.vue'
 
 const props = defineProps<{ event: EventDetail }>()
+
+const auth = useAuthStore()
+const bisaUbahStatus = (t: TaskRow) => bolehUbahStatus(t, auth.crewId)
 
 const toast = useToast()
 const confirm = useConfirm()
@@ -176,6 +181,7 @@ function konfirmasiHapus(t: TaskRow) {
     judul="Task"
     deskripsi="Tugas persiapan dan pelaksanaan event beserta penanggung jawabnya."
     label-tambah="Tambah task"
+    :tanpa-tambah="!event.bolehKelola"
     ikon-kosong="pi-check-square"
     pesan-kosong="Belum ada task. Pecah persiapan event jadi tugas-tugas kecil dengan PIC dan deadline."
     :is-pending="daftar.isPending.value"
@@ -201,8 +207,8 @@ function konfirmasiHapus(t: TaskRow) {
       <TaskTable
         v-if="tampil.length"
         :items="tampil"
-        bisa-kelola
-        :bisa-ubah-status="() => true"
+        :bisa-kelola="event.bolehKelola"
+        :bisa-ubah-status="bisaUbahStatus"
         :id-ubah-status="mutasiStatus.isPending.value ? mutasiStatus.variables.value?.t.id : null"
         :id-dihapus="mutasiHapus.isPending.value ? mutasiHapus.variables.value?.id : null"
         @edit="bukaEdit"
@@ -215,6 +221,7 @@ function konfirmasiHapus(t: TaskRow) {
 
   <TaskForm
     v-model:visible="formTerbuka"
+    :event-id="event.id"
     :task="dipilih"
     :menyimpan="mutasiSimpan.isPending.value"
     :simpan="simpan"

@@ -9,13 +9,13 @@ import DatePicker from 'primevue/datepicker'
 import Textarea from 'primevue/textarea'
 import FormDialog from '@/components/FormDialog.vue'
 import { errorPerField, pesanError } from '@/api/http'
-import { usePilihan } from '@/composables/usePilihan'
-import { listPilihanUser } from '@/features/users/user.api'
-import { LABEL_PERAN } from '@/features/auth/auth.types'
+import { usePenanggungJawab } from '@/features/events/usePenanggungJawab'
 import { taskSchema, type TaskFormValues, type TaskPayload } from './task.schema'
 import { PILIHAN_STATUS_TASK, type TaskRow } from './task.types'
 
 const props = defineProps<{
+  /** Event pemilik task; PIC hanya bisa dipilih dari crew yang terlibat di event ini. */
+  eventId: string
   task: TaskRow | null
   menyimpan: boolean
   simpan: (payload: TaskPayload) => Promise<void>
@@ -26,25 +26,16 @@ const modeEdit = computed(() => props.task !== null)
 const pesanGagal = ref('')
 const PILIHAN_STATUS = PILIHAN_STATUS_TASK
 
-const pilihanPic = usePilihan({
-  key: ['users', 'pilihan', 'semua'],
-  ambil: (search) => listPilihanUser(undefined, search),
+const pilihanPic = usePenanggungJawab({
+  eventId: () => props.eventId,
   aktif: visible,
-  terpilih: () =>
-    props.task?.picUserId
-      ? {
-          id: props.task.picUserId,
-          nama: props.task.namaPic ?? '',
-          email: '',
-          role: 'crew' as const,
-        }
-      : null,
+  terpilih: () => props.task && { crewId: props.task.picCrewId, nama: props.task.namaPic },
 })
 
 function nilaiAwal(t: TaskRow | null): TaskFormValues {
   return {
     namaTugas: t?.namaTugas ?? '',
-    picUserId: t?.picUserId ?? null,
+    picCrewId: t?.picCrewId ?? null,
     deadline: t?.deadline ? dayjs(t.deadline).toDate() : null,
     // Data lama berstatus terlambat diperlakukan sebagai belum.
     status: t && t.status !== 'terlambat' ? t.status : 'belum',
@@ -53,7 +44,7 @@ function nilaiAwal(t: TaskRow | null): TaskFormValues {
   }
 }
 
-const FIELD_FORM = ['namaTugas', 'picUserId', 'deadline', 'status', 'deskripsi', 'catatan'] as const
+const FIELD_FORM = ['namaTugas', 'picCrewId', 'deadline', 'status', 'deskripsi', 'catatan'] as const
 
 const { defineField, errors, handleSubmit, resetForm, setErrors } = useForm({
   validationSchema: skemaForm(taskSchema),
@@ -62,7 +53,7 @@ const { defineField, errors, handleSubmit, resetForm, setErrors } = useForm({
 
 const lazy = (state: { errors: string[] }) => ({ validateOnModelUpdate: state.errors.length > 0 })
 const [namaTugas, namaTugasAttrs] = defineField('namaTugas', lazy)
-const [picUserId] = defineField('picUserId', lazy)
+const [picCrewId] = defineField('picCrewId', lazy)
 const [deadline] = defineField('deadline', lazy)
 const [status] = defineField('status')
 const [deskripsi, deskripsiAttrs] = defineField('deskripsi', lazy)
@@ -114,29 +105,31 @@ const kirim = handleSubmit(async (values) => {
       <div class="baris">
         <label for="task-pic">PIC tugas <span class="wajib">*</span></label>
         <Select
-          v-model="picUserId"
+          v-model="picCrewId"
           input-id="task-pic"
           :options="pilihanPic.opsi"
           option-label="nama"
-          option-value="id"
+          option-value="crewId"
           :loading="pilihanPic.memuat"
-          @filter="pilihanPic.cari($event.value)"
           filter
           placeholder="Pilih penanggung jawab"
-          :invalid="Boolean(errors.picUserId)"
+          :invalid="Boolean(errors.picCrewId)"
           fluid
         >
           <template #option="{ option }">
             <div class="opsi">
               <span>{{ option.nama }}</span>
-              <small>{{ LABEL_PERAN[option.role as keyof typeof LABEL_PERAN] }}</small>
+              <small
+                >{{ option.keterangan }}{{ option.punyaAkun ? '' : ' · tanpa akun login' }}</small
+              >
             </div>
           </template>
         </Select>
-        <small v-if="errors.picUserId" class="galat">{{ errors.picUserId }}</small>
+        <small v-if="errors.picCrewId" class="galat">{{ errors.picCrewId }}</small>
         <small v-else-if="pilihanPic.gagal" class="galat">
-          Daftar pengguna gagal dimuat. {{ pesanError(pilihanPic.error) }}
+          Daftar crew gagal dimuat. {{ pesanError(pilihanPic.error) }}
         </small>
+        <small v-else class="bantuan">PIC event atau crew yang ditugaskan di tab Crew.</small>
       </div>
 
       <div class="baris">

@@ -31,11 +31,17 @@ export const useAuthStore = defineStore('auth', () => {
   const peran = computed(() => user.value?.role ?? null)
   const isAdmin = computed(() => peran.value === 'admin')
 
+  /** Data crew yang ditautkan ke akun login. Null untuk admin, event manager, atau crew yang belum ditautkan. */
+  const crewId = computed(() => user.value?.crewId ?? null)
+
   /**
-   * Penentu apakah angka fee dan anggaran boleh ditampilkan.
-   * Ini hanya untuk menyembunyikan menu. Penjagaan sebenarnya ada di backend.
+   * Admin, atau crew yang akunnya sudah ditautkan ke data crew (ia otomatis menjadi PIC event buatannya).
+   * Hak mengubah event tertentu dibaca dari `bolehKelola` di data event.
+   * Semua ini hanya untuk menyembunyikan tombol; penjagaan sebenarnya ada di backend.
    */
-  const bolehLihatUang = computed(() => peran.value === 'admin' || peran.value === 'pic')
+  const bolehBuatEvent = computed(
+    () => isAdmin.value || (peran.value === 'crew' && crewId.value !== null),
+  )
 
   function simpanSesi(hasil: LoginResponse) {
     accessToken.value = hasil.accessToken
@@ -105,7 +111,8 @@ export const useAuthStore = defineStore('auth', () => {
     sudahLogin,
     peran,
     isAdmin,
-    bolehLihatUang,
+    crewId,
+    bolehBuatEvent,
     login,
     logout,
     hapusSesi,

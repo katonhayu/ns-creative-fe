@@ -7,7 +7,13 @@ import type { Skema } from '@/api/types'
 import { tanggal, tanggalJam } from '@/utils/format'
 import type { EventDetail } from './event.types'
 import type { EventCrewPayload, EventTalentPayload, EventVendorPayload } from './penugasan.schema'
-import type { Bentrok, EventCrew, EventTalent, EventVendor } from './penugasan.types'
+import type {
+  Bentrok,
+  EventCrew,
+  EventTalent,
+  EventVendor,
+  PenanggungJawab,
+} from './penugasan.types'
 
 /** Rentang event yang dicek, tanpa menghitung penugasan di event ini sendiri. */
 function rentang(event: Pick<EventDetail, 'id' | 'tanggalMulai' | 'tanggalSelesai'>) {
@@ -93,6 +99,15 @@ export async function updateEventCrew(
 
 export async function deleteEventCrew(eventId: string, id: string): Promise<void> {
   await http.delete(`/events/${eventId}/crews/${id}`)
+}
+
+/**
+ * Crew yang boleh menjadi PIC task atau sesi rundown di event ini: PIC event, lalu crew yang
+ * ditugaskan (urut nama). Crew di luar daftar ini ditolak backend.
+ */
+export async function listPenanggungJawab(eventId: string): Promise<PenanggungJawab[]> {
+  const { data } = await http.get<PenanggungJawab[]>(`/events/${eventId}/penanggung-jawab`)
+  return data
 }
 
 /**

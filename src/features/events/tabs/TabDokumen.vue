@@ -212,7 +212,12 @@ function konfirmasiHapus(d: Dokumen) {
           <strong class="angka">{{ semua.length }}</strong> dokumen ·
           {{ ukuranFile(totalUkuran) }}
         </span>
-        <Button label="Unggah dokumen" icon="pi pi-upload" @click="bukaPemilih" />
+        <Button
+          v-if="event.bolehKelola"
+          label="Unggah dokumen"
+          icon="pi pi-upload"
+          @click="bukaPemilih"
+        />
       </div>
     </header>
 
@@ -229,6 +234,7 @@ function konfirmasiHapus(d: Dokumen) {
 
     <!-- Area lepas file. Bisa juga diklik atau difokus lalu Enter untuk memilih file. -->
     <div
+      v-if="event.bolehKelola"
       class="dropzone"
       :class="{ 'dropzone--aktif': sedangDiseret, 'dropzone--besar': !semua.length }"
       role="button"
@@ -364,6 +370,7 @@ function konfirmasiHapus(d: Dokumen) {
                 @click="unduh(d)"
               />
               <Button
+                v-if="event.bolehKelola"
                 icon="pi pi-pen-to-square"
                 text
                 rounded
@@ -373,6 +380,7 @@ function konfirmasiHapus(d: Dokumen) {
                 @click="bukaEdit(d)"
               />
               <Button
+                v-if="event.bolehKelola"
                 icon="pi pi-trash"
                 text
                 rounded

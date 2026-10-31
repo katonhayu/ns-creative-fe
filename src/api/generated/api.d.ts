@@ -1062,6 +1062,7 @@ export interface paths {
                 query?: {
                     search?: string;
                     keahlian?: string;
+                    punyaAkun?: boolean;
                 };
                 header?: never;
                 path?: never;
@@ -1885,6 +1886,61 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/events/{eventId}/penanggung-jawab": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    eventId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PenanggungJawabDto"][];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/events": {
         parameters: {
             query?: never;
@@ -1904,7 +1960,7 @@ export interface paths {
                     Menurun?: boolean;
                     Status?: components["schemas"]["EventStatus"];
                     ClientId?: string;
-                    PicUserId?: string;
+                    PicCrewId?: string;
                     DariTanggal?: string;
                     SampaiTanggal?: string;
                 };
@@ -3856,7 +3912,7 @@ export interface paths {
                     SearchBersih?: string;
                     Menurun?: boolean;
                     Status?: components["schemas"]["TaskItemStatus"];
-                    PicUserId?: string;
+                    PicCrewId?: string;
                 };
                 header?: never;
                 path: {
@@ -5144,7 +5200,7 @@ export interface components {
             /** Format: uuid */
             clientId: string;
             /** Format: uuid */
-            picUserId: string;
+            picCrewId: string | null;
             nama: string;
             jenis: string;
             /** Format: date */
@@ -5190,7 +5246,7 @@ export interface components {
             kegiatan: string;
             lokasi: string | null;
             /** Format: uuid */
-            picUserId: string | null;
+            picCrewId: string | null;
         };
         CreateTalentDto: {
             nama: string;
@@ -5208,7 +5264,7 @@ export interface components {
             deadline: string | null;
             catatan: string | null;
             /** Format: uuid */
-            picUserId: string | null;
+            picCrewId: string | null;
         };
         CreateUserDto: {
             nama: string;
@@ -5305,6 +5361,7 @@ export interface components {
             id: string;
             nama: string;
             keahlian: string | null;
+            punyaAkun: boolean;
         };
         DashboardDto: {
             eventBerlangsung: components["schemas"]["DashboardEventBerlangsungDto"][];
@@ -5453,9 +5510,11 @@ export interface components {
             teleponClient: string | null;
             emailClient: string | null;
             /** Format: uuid */
-            picUserId: string;
+            picCrewId: string;
             namaPic: string;
-            emailPic: string;
+            teleponPic: string | null;
+            emailPic: string | null;
+            bolehKelola: boolean;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -5478,8 +5537,9 @@ export interface components {
             namaClient: string;
             perusahaanClient: string | null;
             /** Format: uuid */
-            picUserId: string;
+            picCrewId: string;
             namaPic: string;
+            bolehKelola: boolean;
         };
         EventListDtoPagedResult: {
             items: components["schemas"]["EventListDto"][];
@@ -5650,6 +5710,13 @@ export interface components {
             /** Format: int32 */
             totalPages: number;
         };
+        PenanggungJawabDto: {
+            /** Format: uuid */
+            crewId: string;
+            nama: string;
+            keterangan: string;
+            punyaAkun: boolean;
+        };
         ProblemDetails: {
             type: string | null;
             title: string | null;
@@ -5779,7 +5846,7 @@ export interface components {
             kegiatan: string;
             lokasi: string | null;
             /** Format: uuid */
-            picUserId: string | null;
+            picCrewId: string | null;
             namaPic: string | null;
             diLuarRentangEvent: boolean;
             /** Format: date-time */
@@ -5898,8 +5965,9 @@ export interface components {
             isTerlambat: boolean;
             catatan: string | null;
             /** Format: uuid */
-            picUserId: string | null;
+            picCrewId: string | null;
             namaPic: string | null;
+            bolehKelola: boolean;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -5959,7 +6027,7 @@ export interface components {
             /** Format: uuid */
             clientId: string;
             /** Format: uuid */
-            picUserId: string;
+            picCrewId: string | null;
             nama: string;
             jenis: string;
             /** Format: date */
@@ -6015,7 +6083,7 @@ export interface components {
             kegiatan: string;
             lokasi: string | null;
             /** Format: uuid */
-            picUserId: string | null;
+            picCrewId: string | null;
         };
         UpdateTalentDto: {
             nama: string;
@@ -6033,7 +6101,7 @@ export interface components {
             deadline: string | null;
             catatan: string | null;
             /** Format: uuid */
-            picUserId: string | null;
+            picCrewId: string | null;
         };
         UpdateTaskStatusDto: {
             status: components["schemas"]["TaskItemStatus"] | null;
@@ -6095,7 +6163,7 @@ export interface components {
             role: components["schemas"]["UserRole"];
         };
         /** @enum {string} */
-        UserRole: "admin" | "pic" | "crew";
+        UserRole: "admin" | "event_manager" | "crew";
         ValidationProblemDetails: {
             type: string | null;
             title: string | null;

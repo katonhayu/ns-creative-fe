@@ -6,6 +6,7 @@ import DatePicker from 'primevue/datepicker'
 import CrudTable from '@/components/CrudTable.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { useCrud } from '@/composables/useCrud'
+import { useAuthStore } from '@/stores/auth'
 import { isoTanggal, rentangTanggal } from '@/utils/format'
 import { eventApi } from './event.api'
 import {
@@ -17,6 +18,8 @@ import {
   type StatusEvent,
 } from './event.types'
 import EventForm from './EventForm.vue'
+
+const auth = useAuthStore()
 
 const filterStatus = ref<StatusEvent | null>(null)
 /** [mulai, selesai]. Selama baru satu tanggal yang dipilih, dianggap rentang satu hari. */
@@ -60,6 +63,9 @@ function alasanTidakBisaHapus(e: EventRow) {
       pesan-kosong="Belum ada event. Buat event pertama dari client yang sudah terdaftar."
       :alasan-tidak-bisa-hapus="alasanTidakBisaHapus"
       :rute-detail="(e) => ({ name: 'event-detail', params: { id: e.id } })"
+      :tanpa-tambah="!auth.bolehBuatEvent"
+      :tanpa-hapus="!auth.isAdmin"
+      :bisa-ubah="(e) => e.bolehKelola"
     >
       <template #filter>
         <Select

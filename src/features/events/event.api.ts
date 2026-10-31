@@ -34,7 +34,7 @@ export async function getEvent(id: string): Promise<EventDetail> {
 function badan(p: EventPayload): Skema['CreateEventDto'] {
   return {
     clientId: p.clientId,
-    picUserId: p.picUserId,
+    picCrewId: p.picCrewId,
     nama: p.nama,
     jenis: p.jenis,
     tanggalMulai: p.tanggalMulai,

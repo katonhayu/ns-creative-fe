@@ -114,6 +114,7 @@ function konfirmasiHapus(t: EventTalent) {
     judul="Talent"
     deskripsi="Talent dari master data beserta kesepakatan khusus event ini."
     label-tambah="Tambah talent"
+    :tanpa-tambah="!event.bolehKelola"
     ikon-kosong="pi-star"
     pesan-kosong="Belum ada talent di event ini. Pilih dari master data talent."
     :is-pending="daftar.isPending.value"
@@ -172,7 +173,13 @@ function konfirmasiHapus(t: EventTalent) {
           <span v-else class="sel-redup">—</span>
         </template>
       </Column>
-      <Column header="Aksi" frozen align-frozen="right" style="width: 5.5rem">
+      <Column
+        v-if="event.bolehKelola"
+        header="Aksi"
+        frozen
+        align-frozen="right"
+        style="width: 5.5rem"
+      >
         <template #body="{ data: t }">
           <div class="aksi">
             <Button

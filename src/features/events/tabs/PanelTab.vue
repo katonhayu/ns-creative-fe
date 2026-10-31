@@ -18,6 +18,8 @@ defineProps<{
   isFetching: boolean
   error: unknown
   kosong: boolean
+  /** Sembunyikan tombol tambah, misalnya bagi pengguna yang hanya boleh melihat event ini. */
+  tanpaTambah?: boolean
 }>()
 const emit = defineEmits<{ tambah: []; muatUlang: [] }>()
 
@@ -37,7 +39,12 @@ defineSlots<{
       </div>
       <div class="kanan">
         <slot name="ringkasan" />
-        <Button :label="labelTambah" icon="pi pi-plus" @click="emit('tambah')" />
+        <Button
+          v-if="!tanpaTambah"
+          :label="labelTambah"
+          icon="pi pi-plus"
+          @click="emit('tambah')"
+        />
       </div>
     </header>
 
@@ -64,7 +71,13 @@ defineSlots<{
     <div v-else-if="kosong" class="kosong">
       <span class="kosong__ikon"><i class="pi" :class="ikonKosong" /></span>
       <p>{{ pesanKosong }}</p>
-      <Button :label="labelTambah" icon="pi pi-plus" size="small" @click="emit('tambah')" />
+      <Button
+        v-if="!tanpaTambah"
+        :label="labelTambah"
+        icon="pi pi-plus"
+        size="small"
+        @click="emit('tambah')"
+      />
     </div>
 
     <slot v-else />

@@ -3,7 +3,7 @@ import type { Skema } from '@/api/types'
 import type { TaskPayload } from './task.schema'
 import type { StatusTask, TaskFilter, TaskRow } from './task.types'
 
-/** Task lintas event (maksimal 500, urut deadline). Crew otomatis hanya melihat task miliknya. */
+/** Task lintas event (maksimal 500, urut deadline). Crew hanya melihat event yang ia pegang atau tempat ia ditugaskan. */
 export async function listTasks(filter: TaskFilter = {}): Promise<TaskRow[]> {
   const { data } = await http.get<TaskRow[]>('/tasks', { params: filter })
   return data
@@ -15,7 +15,7 @@ function isi(p: TaskPayload): Skema['CreateTaskDto'] {
     deskripsi: p.deskripsi,
     deadline: p.deadline,
     catatan: p.catatan,
-    picUserId: p.picUserId,
+    picCrewId: p.picCrewId,
   }
 }
 

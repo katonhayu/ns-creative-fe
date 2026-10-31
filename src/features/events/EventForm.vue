@@ -11,7 +11,7 @@ import FormDialog from '@/components/FormDialog.vue'
 import { errorPerField, pesanError } from '@/api/http'
 import { usePilihan } from '@/composables/usePilihan'
 import { listPilihanClient } from '@/features/clients/client.api'
-import { listPilihanUser } from '@/features/users/user.api'
+import { listPilihanCrew } from '@/features/crews/crew.api'
 import { useAuthStore } from '@/stores/auth'
 import {
   SARAN_JENIS_EVENT,
@@ -31,8 +31,11 @@ const visible = defineModel<boolean>('visible', { required: true })
 
 const auth = useAuthStore()
 const modeEdit = computed(() => props.event !== null)
-/** PIC tidak bisa memindahkan event ke orang lain. */
-const picTerkunci = computed(() => auth.peran === 'pic')
+/**
+ * Hanya admin yang memilih dan memindahkan PIC. Crew yang membuat event otomatis menjadi PIC
+ * lewat data crew yang ditautkan ke akunnya.
+ */
+const picTerkunci = computed(() => !auth.isAdmin)
 const pesanGagal = ref('')
 
 const pilihanClient = usePilihan({
@@ -46,16 +49,17 @@ const pilihanClient = usePilihan({
       perusahaan: props.event.perusahaanClient,
     },
 })
+// PIC event = crew yang punya akun login aktif, karena PIC-lah yang mengelola event.
 const pilihanPic = usePilihan({
-  key: ['users', 'pilihan', 'pic'],
-  ambil: (search) => listPilihanUser(['admin', 'pic'], search),
-  aktif: visible,
-  // PIC yang sedang dipegang (atau diri sendiri saat PIC membuat event) selalu ada di daftar.
+  key: ['crews', 'pilihan', 'pic'],
+  ambil: (search) => listPilihanCrew(search, true),
+  aktif: () => visible.value && !picTerkunci.value,
+  // PIC yang sedang dipegang (atau diri sendiri saat crew membuat event) selalu ada di daftar.
   terpilih: () =>
     props.event
-      ? { id: props.event.picUserId, nama: props.event.namaPic, email: '', role: 'pic' as const }
-      : picTerkunci.value
-        ? auth.user
+      ? { id: props.event.picCrewId, nama: props.event.namaPic, keahlian: null, punyaAkun: true }
+      : picTerkunci.value && auth.crewId
+        ? { id: auth.crewId, nama: auth.user?.nama ?? '', keahlian: null, punyaAkun: true }
         : null,
 })
 
@@ -72,7 +76,7 @@ function nilaiAwal(e: EventItem | null): EventFormValues {
   return {
     nama: e?.nama ?? '',
     clientId: e?.clientId ?? null,
-    picUserId: e?.picUserId ?? (picTerkunci.value ? (auth.user?.id ?? null) : null),
+    picCrewId: e?.picCrewId ?? (picTerkunci.value ? auth.crewId : null),
     jenis: e?.jenis ?? '',
     tanggalMulai: e ? dayjs(e.tanggalMulai).toDate() : null,
     tanggalSelesai: e ? dayjs(e.tanggalSelesai ?? e.tanggalMulai).toDate() : null,
@@ -85,7 +89,7 @@ function nilaiAwal(e: EventItem | null): EventFormValues {
 const FIELD_FORM = [
   'nama',
   'clientId',
-  'picUserId',
+  'picCrewId',
   'jenis',
   'tanggalMulai',
   'tanggalSelesai',
@@ -102,7 +106,7 @@ const { defineField, errors, handleSubmit, resetForm, setErrors } = useForm({
 const lazy = (state: { errors: string[] }) => ({ validateOnModelUpdate: state.errors.length > 0 })
 const [nama, namaAttrs] = defineField('nama', lazy)
 const [clientId] = defineField('clientId', lazy)
-const [picUserId] = defineField('picUserId', lazy)
+const [picCrewId] = defineField('picCrewId', lazy)
 const [jenis] = defineField('jenis', lazy)
 const [tanggalMulai] = defineField('tanggalMulai', lazy)
 const [tanggalSelesai] = defineField('tanggalSelesai', lazy)
@@ -253,22 +257,28 @@ const kirim = handleSubmit(async (values) => {
       <div class="baris">
         <label for="event-pic">PIC <span class="wajib">*</span></label>
         <Select
-          v-model="picUserId"
+          v-model="picCrewId"
           input-id="event-pic"
           :options="pilihanPic.opsi"
           option-label="nama"
           option-value="id"
-          :loading="pilihanPic.memuat"
+          :loading="!picTerkunci && pilihanPic.memuat"
           :disabled="picTerkunci"
           filter
           @filter="pilihanPic.cari($event.value)"
-          placeholder="Pilih PIC"
-          :invalid="Boolean(errors.picUserId)"
+          placeholder="Pilih crew PIC"
+          :invalid="Boolean(errors.picCrewId)"
           fluid
         />
-        <small v-if="errors.picUserId" class="galat">{{ errors.picUserId }}</small>
-        <small v-else-if="picTerkunci" class="bantuan"
+        <small v-if="errors.picCrewId" class="galat">{{ errors.picCrewId }}</small>
+        <small v-else-if="picTerkunci && !modeEdit" class="bantuan"
           >Event yang kamu buat otomatis kamu pegang.</small
+        >
+        <small v-else-if="picTerkunci" class="bantuan"
+          >Hanya admin yang bisa memindahkan event ke PIC lain.</small
+        >
+        <small v-else class="bantuan"
+          >Hanya crew yang punya akun login yang bisa menjadi PIC.</small
         >
       </div>
 

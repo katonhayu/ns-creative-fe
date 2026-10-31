@@ -26,7 +26,7 @@ export function userSchema(modeEdit: boolean) {
       .max(100, 'Maksimal 100 karakter.')
       .email('Format email tidak valid.')
       .transform((v) => v.toLowerCase()),
-    role: z.enum(['admin', 'pic', 'crew'], { message: 'Peran harus dipilih.' }),
+    role: z.enum(['admin', 'event_manager', 'crew'], { message: 'Peran harus dipilih.' }),
     isAktif: z.boolean(),
     password,
   })

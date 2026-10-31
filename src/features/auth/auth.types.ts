@@ -4,11 +4,11 @@ export type Peran = Skema['UserRole']
 
 export const LABEL_PERAN: Record<Peran, string> = {
   admin: 'Admin',
-  pic: 'PIC',
+  event_manager: 'Event Manager',
   crew: 'Crew',
 }
 
-/** Pengguna login: id, nama, email, role, dan crewId (untuk peran crew). */
+/** Pengguna login: id, nama, email, role, dan crewId (data crew yang ditautkan ke akun, untuk peran crew). */
 export type PenggunaAktif = Skema['AuthUserDto']
 
 /** Respons login, refresh, dan ganti kata sandi. */

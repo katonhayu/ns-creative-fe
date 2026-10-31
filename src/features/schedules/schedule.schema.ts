@@ -29,7 +29,7 @@ export function scheduleSchema(r: RentangEvent) {
         .transform(isoTanggal),
       waktuMulai: wajibTanggal('Jam mulai harus diisi.').transform(keJam),
       waktuSelesai: wajibTanggal('Jam selesai harus diisi.').transform(keJam),
-      picUserId: wajibPilih('PIC sesi harus dipilih.'),
+      picCrewId: wajibPilih('PIC sesi harus dipilih.'),
       lokasi: opsional(200),
     })
     .superRefine((v, ctx) => {

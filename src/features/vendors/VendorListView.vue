@@ -2,8 +2,11 @@
 import Column from 'primevue/column'
 import CrudTable from '@/components/CrudTable.vue'
 import { useCrud } from '@/composables/useCrud'
+import { useAuthStore } from '@/stores/auth'
 import { vendorApi } from './vendor.api'
 import VendorForm from './VendorForm.vue'
+
+const auth = useAuthStore()
 
 const crud = useCrud({
   key: 'vendors',
@@ -20,6 +23,7 @@ const crud = useCrud({
   <div class="halaman">
     <CrudTable
       :crud="crud"
+      :hanya-lihat="!auth.isAdmin"
       judul="Data Vendor"
       placeholder-cari="Cari nama vendor atau jenis jasa/barang…"
       ikon-kosong="pi-truck"

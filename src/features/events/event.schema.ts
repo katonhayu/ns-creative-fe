@@ -21,7 +21,7 @@ export const eventSchema = z
   .object({
     nama: wajib('Nama event harus diisi.', 150),
     clientId: wajibPilih('Client harus dipilih.'),
-    picUserId: wajibPilih('PIC harus dipilih.'),
+    picCrewId: wajibPilih('PIC harus dipilih.'),
     jenis: wajib('Jenis event harus diisi.', 50),
     tanggalMulai: wajibTanggal('Tanggal mulai harus diisi.'),
     tanggalSelesai: wajibTanggal('Tanggal selesai harus diisi.'),

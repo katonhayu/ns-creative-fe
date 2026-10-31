@@ -110,6 +110,7 @@ function konfirmasiHapus(s: ScheduleRow) {
     judul="Rundown"
     deskripsi="Susunan acara per tanggal, diurutkan menurut jam."
     label-tambah="Tambah sesi"
+    :tanpa-tambah="!event.bolehKelola"
     ikon-kosong="pi-clock"
     pesan-kosong="Rundown masih kosong. Tambahkan sesi pertama, misalnya registrasi atau loading barang."
     :is-pending="daftar.isPending.value"
@@ -129,7 +130,7 @@ function konfirmasiHapus(s: ScheduleRow) {
 
     <RundownList
       :items="semua"
-      bisa-kelola
+      :bisa-kelola="event.bolehKelola"
       :tanggal-mulai-event="event.tanggalMulai"
       :id-dihapus="mutasiHapus.isPending.value ? mutasiHapus.variables.value?.id : null"
       @edit="bukaEdit"

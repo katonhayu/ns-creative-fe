@@ -24,6 +24,7 @@ const crud = useCrud({
   <div class="halaman">
     <CrudTable
       :crud="crud"
+      :hanya-lihat="!auth.isAdmin"
       judul="Data Pengguna"
       placeholder-cari="Cari nama atau email pengguna…"
       ikon-kosong="pi-id-card"

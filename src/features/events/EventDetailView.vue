@@ -8,7 +8,6 @@ import Skeleton from 'primevue/skeleton'
 import SelectButton from 'primevue/selectbutton'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { pesanError } from '@/api/http'
-import { useAuthStore } from '@/stores/auth'
 import { rentangTanggal } from '@/utils/format'
 import { getEvent, updateEvent } from './event.api'
 import type { EventPayload } from './event.schema'
@@ -29,7 +28,6 @@ const props = defineProps<{ id: string }>()
 
 const route = useRoute()
 const router = useRouter()
-const auth = useAuthStore()
 const toast = useToast()
 const queryClient = useQueryClient()
 
@@ -47,24 +45,24 @@ watch(event, (e) => {
 
 // --- Tab ---------------------------------------------------------------------
 
-const TAB = computed(() =>
-  [
-    { value: 'ringkasan', label: 'Ringkasan', ikon: 'pi-th-large' },
-    { value: 'talent', label: 'Talent', ikon: 'pi-star' },
-    { value: 'crew', label: 'Crew', ikon: 'pi-users' },
-    { value: 'vendor', label: 'Vendor', ikon: 'pi-truck' },
-    { value: 'rundown', label: 'Rundown', ikon: 'pi-clock' },
-    { value: 'task', label: 'Task', ikon: 'pi-check-square' },
-    { value: 'budget', label: 'Budget', ikon: 'pi-wallet', uang: true },
-    { value: 'dokumen', label: 'Dokumen', ikon: 'pi-folder' },
-    { value: 'laporan', label: 'Laporan', ikon: 'pi-file' },
-  ].filter((t) => !t.uang || auth.bolehLihatUang),
-)
+// Semua yang bisa membuka event melihat semua tab, termasuk Budget. Tombol ubah di tiap tab
+// hanya muncul jika event.bolehKelola (admin atau crew PIC event ini).
+const TAB = [
+  { value: 'ringkasan', label: 'Ringkasan', ikon: 'pi-th-large' },
+  { value: 'talent', label: 'Talent', ikon: 'pi-star' },
+  { value: 'crew', label: 'Crew', ikon: 'pi-users' },
+  { value: 'vendor', label: 'Vendor', ikon: 'pi-truck' },
+  { value: 'rundown', label: 'Rundown', ikon: 'pi-clock' },
+  { value: 'task', label: 'Task', ikon: 'pi-check-square' },
+  { value: 'budget', label: 'Budget', ikon: 'pi-wallet' },
+  { value: 'dokumen', label: 'Dokumen', ikon: 'pi-folder' },
+  { value: 'laporan', label: 'Laporan', ikon: 'pi-file' },
+]
 
 const tabAktif = computed({
   get: () => {
     const q = route.query.tab
-    return typeof q === 'string' && TAB.value.some((t) => t.value === q) ? q : 'ringkasan'
+    return typeof q === 'string' && TAB.some((t) => t.value === q) ? q : 'ringkasan'
   },
   set: (tab: string) => {
     router.replace({ query: { ...route.query, tab: tab === 'ringkasan' ? undefined : tab } })
@@ -157,11 +155,19 @@ async function simpan(payload: EventPayload) {
               {{ mundur.judul }}
             </span>
             <Button
+              v-if="event.bolehKelola"
               label="Edit event"
               icon="pi pi-pen-to-square"
               outlined
               @click="formTerbuka = true"
             />
+            <span
+              v-else
+              class="hanya-lihat"
+              title="Hanya admin dan PIC event yang bisa mengubah data"
+            >
+              <i class="pi pi-eye" /> Hanya lihat
+            </span>
           </div>
         </div>
       </section>
@@ -202,7 +208,7 @@ async function simpan(payload: EventPayload) {
           <TabRundown v-else-if="tabAktif === 'rundown'" :event="event" />
           <TabTask v-else-if="tabAktif === 'task'" :event="event" />
           <TabBudget
-            v-else-if="tabAktif === 'budget' && auth.bolehLihatUang"
+            v-else-if="tabAktif === 'budget'"
             :event="event"
             @buka-tab="tabAktif = $event"
           />
@@ -341,6 +347,18 @@ async function simpan(payload: EventPayload) {
 .mundur--ungu {
   background: var(--ns-surface-2);
   color: var(--ns-text-2);
+}
+
+.hanya-lihat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-sm);
+  color: var(--ns-text-2);
+  font-size: 0.85rem;
+  white-space: nowrap;
 }
 
 /* Error */

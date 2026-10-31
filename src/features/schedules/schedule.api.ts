@@ -3,8 +3,8 @@ import type { SchedulePayload } from './schedule.schema'
 import type { ScheduleFilter, ScheduleRow } from './schedule.types'
 
 /**
- * Sesi rundown lintas event yang terlihat oleh pengguna (pic: event miliknya, crew: event
- * tempat ia bertugas), urut tanggal dan jam. Semua filter opsional; maksimal 500 sesi terbaru.
+ * Sesi rundown lintas event yang terlihat oleh pengguna (crew: event yang ia pegang atau
+ * tempat ia ditugaskan), urut tanggal dan jam. Semua filter opsional; maksimal 500 sesi terbaru.
  */
 export async function listSchedules(filter: ScheduleFilter = {}): Promise<ScheduleRow[]> {
   const { data } = await http.get<ScheduleRow[]>('/schedules', {

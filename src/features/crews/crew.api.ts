@@ -8,9 +8,14 @@ export async function listCrews(params: CrewListParams): Promise<Paged<CrewRow>>
   return data
 }
 
-/** Pilihan crew untuk dropdown penugasan (maksimal 50, dicari di server). */
-export async function listPilihanCrew(search = ''): Promise<CrewPilihan[]> {
-  const { data } = await http.get<CrewPilihan[]>('/crews/lookup', { params: { search } })
+/**
+ * Pilihan crew untuk dropdown (maksimal 50, dicari di server).
+ * `punyaAkun`: hanya crew dengan akun login aktif, yaitu yang bisa menjadi PIC event.
+ */
+export async function listPilihanCrew(search = '', punyaAkun = false): Promise<CrewPilihan[]> {
+  const { data } = await http.get<CrewPilihan[]>('/crews/lookup', {
+    params: { search, punyaAkun: punyaAkun || undefined },
+  })
   return data
 }
 

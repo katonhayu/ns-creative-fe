@@ -15,7 +15,6 @@ import {
   type LaporanPayload,
 } from '@/features/reports/report.schema'
 import type { Laporan } from '@/features/reports/report.types'
-import { useAuthStore } from '@/stores/auth'
 import { rupiah, tanggal } from '@/utils/format'
 import { getRingkasanEvent } from '../event.api'
 import { STATUS_EVENT, type EventDetail } from '../event.types'
@@ -23,7 +22,6 @@ import { STATUS_EVENT, type EventDetail } from '../event.types'
 const props = defineProps<{ event: EventDetail }>()
 const emit = defineEmits<{ editEvent: []; bukaTab: [tab: string] }>()
 
-const auth = useAuthStore()
 const toast = useToast()
 const queryClient = useQueryClient()
 
@@ -136,7 +134,10 @@ const kirim = handleSubmit(async (values) => {
   }
 })
 
-const tampilForm = computed(() => sudahSelesai.value && (!data.value || modeEdit.value))
+// Hanya admin dan PIC event yang membuat atau mengubah laporan; pengguna lain hanya membaca.
+const tampilForm = computed(
+  () => props.event.bolehKelola && sudahSelesai.value && (!data.value || modeEdit.value),
+)
 </script>
 
 <template>
@@ -147,7 +148,7 @@ const tampilForm = computed(() => sudahSelesai.value && (!data.value || modeEdit
         <p>Evaluasi pelaksanaan event. Angka total ditarik otomatis dari budget dan task.</p>
       </div>
       <Button
-        v-if="data && !modeEdit && sudahSelesai"
+        v-if="data && !modeEdit && sudahSelesai && event.bolehKelola"
         label="Edit laporan"
         icon="pi pi-pen-to-square"
         outlined
@@ -184,7 +185,7 @@ const tampilForm = computed(() => sudahSelesai.value && (!data.value || modeEdit
         >.
       </p>
       <Button
-        v-if="event.status !== 'dibatalkan'"
+        v-if="event.status !== 'dibatalkan' && event.bolehKelola"
         label="Ubah status event"
         icon="pi pi-pen-to-square"
         outlined
@@ -244,12 +245,7 @@ const tampilForm = computed(() => sudahSelesai.value && (!data.value || modeEdit
         </button>
       </div>
 
-      <Message
-        v-if="data && selisihSnapshot !== 0 && auth.bolehLihatUang"
-        severity="info"
-        :closable="false"
-        size="small"
-      >
+      <Message v-if="data && selisihSnapshot !== 0" severity="info" :closable="false" size="small">
         Biaya aktual di budget sekarang {{ rupiah(angka?.budget?.aktual ?? 0) }}, berbeda
         {{ rupiah(Math.abs(selisihSnapshot)) }} dari angka laporan. Total di laporan sengaja tidak
         ikut berubah karena dibekukan saat laporan dibuat.
@@ -374,6 +370,7 @@ const tampilForm = computed(() => sudahSelesai.value && (!data.value || modeEdit
           Status event sudah bukan Selesai, jadi laporan tidak bisa diedit.
         </p>
       </div>
+      <p v-else class="redup">Laporan belum dibuat. Laporan dibuat oleh PIC event atau admin.</p>
     </template>
   </section>
 </template>

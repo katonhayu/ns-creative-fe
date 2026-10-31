@@ -19,8 +19,19 @@ export const PILIHAN_STATUS_TASK = (['belum', 'dikerjakan', 'selesai'] as const)
 export interface TaskFilter {
   /** Kosong = semua event yang boleh dilihat pengguna. */
   eventId?: string
-  /** Hanya task yang PIC-nya pengguna saat ini (crew selalu hanya task miliknya). */
+  /** Hanya task yang PIC-nya crew milik pengguna saat ini. */
   milikSaya?: boolean
+}
+
+/**
+ * Status task boleh diubah oleh admin dan PIC event (`bolehKelola`), atau oleh crew yang
+ * menjadi PIC task itu sendiri. Hanya untuk menyembunyikan kontrol; backend tetap menegakkannya.
+ */
+export function bolehUbahStatus(
+  t: Pick<TaskRow, 'bolehKelola' | 'picCrewId'>,
+  crewId: string | null,
+) {
+  return t.bolehKelola || (crewId !== null && t.picCrewId === crewId)
 }
 
 /** Deadline sudah lewat tapi task belum selesai. Task tanpa deadline tidak pernah terlambat. */

@@ -27,8 +27,8 @@ const props = withDefaults(
     bisaKelola?: boolean
     /** Tanggal mulai event, untuk label "Hari ke-n" di tab Rundown. */
     tanggalMulaiEvent?: string
-    /** Sesi yang PIC-nya pengguna ini diberi sorotan. */
-    sorotUserId?: string | null
+    /** Sesi yang PIC-nya crew ini (crew milik pengguna login) diberi sorotan. */
+    sorotCrewId?: string | null
     idDihapus?: string | null
   }>(),
   {
@@ -36,7 +36,7 @@ const props = withDefaults(
     tautanEvent: true,
     bisaKelola: false,
     tanggalMulaiEvent: undefined,
-    sorotUserId: null,
+    sorotCrewId: null,
     idDihapus: null,
   },
 )
@@ -89,7 +89,7 @@ const sedangBerjalan = (s: ScheduleRow) =>
           class="sesi"
           :class="{
             'sesi--kini': sedangBerjalan(s),
-            'sesi--sorot': sorotUserId !== null && s.picUserId === sorotUserId,
+            'sesi--sorot': sorotCrewId !== null && s.picCrewId === sorotCrewId,
           }"
         >
           <div class="sesi__jam angka">
@@ -102,7 +102,7 @@ const sedangBerjalan = (s: ScheduleRow) =>
               <span>{{ s.kegiatan }}</span>
               <span v-if="sedangBerjalan(s)" class="lencana lencana--kini">Sedang berlangsung</span>
               <span
-                v-if="sorotUserId !== null && s.picUserId === sorotUserId"
+                v-if="sorotCrewId !== null && s.picCrewId === sorotCrewId"
                 class="lencana lencana--sorot"
               >
                 Kamu PIC

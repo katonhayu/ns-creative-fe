@@ -110,6 +110,7 @@ function konfirmasiHapus(v: EventVendor) {
     judul="Vendor"
     deskripsi="Penyedia jasa dan barang untuk event ini beserta status pembayarannya."
     label-tambah="Tambah vendor"
+    :tanpa-tambah="!event.bolehKelola"
     ikon-kosong="pi-truck"
     pesan-kosong="Belum ada vendor di event ini. Pilih dari master data vendor."
     :is-pending="daftar.isPending.value"
@@ -151,7 +152,13 @@ function konfirmasiHapus(v: EventVendor) {
           <StatusBadge :status="STATUS_PEMBAYARAN[v.statusPembayaran as StatusPembayaran]" />
         </template>
       </Column>
-      <Column header="Aksi" frozen align-frozen="right" style="width: 5.5rem">
+      <Column
+        v-if="event.bolehKelola"
+        header="Aksi"
+        frozen
+        align-frozen="right"
+        style="width: 5.5rem"
+      >
         <template #body="{ data: v }">
           <div class="aksi">
             <Button

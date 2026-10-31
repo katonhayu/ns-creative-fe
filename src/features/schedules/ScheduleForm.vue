@@ -8,10 +8,8 @@ import Select from 'primevue/select'
 import DatePicker from 'primevue/datepicker'
 import FormDialog from '@/components/FormDialog.vue'
 import { errorPerField, pesanError } from '@/api/http'
-import { usePilihan } from '@/composables/usePilihan'
-import { LABEL_PERAN } from '@/features/auth/auth.types'
 import type { EventDetail } from '@/features/events/event.types'
-import { listPilihanUser } from '@/features/users/user.api'
+import { usePenanggungJawab } from '@/features/events/usePenanggungJawab'
 import {
   dariJam,
   scheduleSchema,
@@ -33,24 +31,11 @@ const visible = defineModel<boolean>('visible', { required: true })
 const modeEdit = computed(() => props.sesi !== null)
 const pesanGagal = ref('')
 
-const pilihanPic = usePilihan({
-  key: ['users', 'pilihan', 'semua'],
-  ambil: (search) => listPilihanUser(undefined, search),
+// PIC sesi dipilih dari crew yang terlibat di event; sesi baru otomatis dipegang PIC event.
+const pilihanPic = usePenanggungJawab({
+  eventId: () => props.event.id,
   aktif: visible,
-  terpilih: () =>
-    props.sesi?.picUserId
-      ? {
-          id: props.sesi.picUserId,
-          nama: props.sesi.namaPic ?? '',
-          email: '',
-          role: 'crew' as const,
-        }
-      : {
-          id: props.event.picUserId,
-          nama: props.event.namaPic,
-          email: props.event.emailPic,
-          role: 'pic' as const,
-        },
+  terpilih: () => props.sesi && { crewId: props.sesi.picCrewId, nama: props.sesi.namaPic },
 })
 
 function nilaiAwal(s: ScheduleRow | null): ScheduleFormValues {
@@ -60,7 +45,7 @@ function nilaiAwal(s: ScheduleRow | null): ScheduleFormValues {
     tanggal: dayjs(tgl).toDate(),
     waktuMulai: s ? dariJam(s.waktuMulai) : null,
     waktuSelesai: s?.waktuSelesai ? dariJam(s.waktuSelesai) : null,
-    picUserId: s?.picUserId ?? props.event.picUserId,
+    picCrewId: s?.picCrewId ?? props.event.picCrewId,
     lokasi: s?.lokasi ?? '',
   }
 }
@@ -70,7 +55,7 @@ const FIELD_FORM = [
   'tanggal',
   'waktuMulai',
   'waktuSelesai',
-  'picUserId',
+  'picCrewId',
   'lokasi',
 ] as const
 
@@ -84,7 +69,7 @@ const [kegiatan, kegiatanAttrs] = defineField('kegiatan', lazy)
 const [tanggal] = defineField('tanggal', lazy)
 const [waktuMulai] = defineField('waktuMulai', lazy)
 const [waktuSelesai] = defineField('waktuSelesai', lazy)
-const [picUserId] = defineField('picUserId', lazy)
+const [picCrewId] = defineField('picCrewId', lazy)
 const [lokasi, lokasiAttrs] = defineField('lokasi', lazy)
 
 // Jam selesai default satu jam setelah jam mulai.
@@ -195,25 +180,29 @@ const kirim = handleSubmit(async (values) => {
       <div class="baris">
         <label for="sesi-pic">PIC sesi <span class="wajib">*</span></label>
         <Select
-          v-model="picUserId"
+          v-model="picCrewId"
           input-id="sesi-pic"
           :options="pilihanPic.opsi"
           option-label="nama"
-          option-value="id"
+          option-value="crewId"
           :loading="pilihanPic.memuat"
           filter
-          @filter="pilihanPic.cari($event.value)"
-          :invalid="Boolean(errors.picUserId)"
+          :invalid="Boolean(errors.picCrewId)"
           fluid
         >
           <template #option="{ option }">
             <div class="opsi">
               <span>{{ option.nama }}</span>
-              <small>{{ LABEL_PERAN[option.role as keyof typeof LABEL_PERAN] }}</small>
+              <small
+                >{{ option.keterangan }}{{ option.punyaAkun ? '' : ' · tanpa akun login' }}</small
+              >
             </div>
           </template>
         </Select>
-        <small v-if="errors.picUserId" class="galat">{{ errors.picUserId }}</small>
+        <small v-if="errors.picCrewId" class="galat">{{ errors.picCrewId }}</small>
+        <small v-else-if="pilihanPic.gagal" class="galat">
+          Daftar crew gagal dimuat. {{ pesanError(pilihanPic.error) }}
+        </small>
       </div>
 
       <div class="baris">

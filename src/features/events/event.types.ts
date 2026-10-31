@@ -53,7 +53,7 @@ export type EventItem = Pick<
   | 'clientId'
   | 'namaClient'
   | 'perusahaanClient'
-  | 'picUserId'
+  | 'picCrewId'
   | 'namaPic'
 >
 

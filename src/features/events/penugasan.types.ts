@@ -31,6 +31,9 @@ export type EventTalent = Skema['EventTalentDto']
 /** Penugasan crew, beserta daftar bentrok jadwal di event lain (hanya peringatan). */
 export type EventCrew = Skema['EventCrewDto']
 
+/** Pilihan PIC task dan sesi rundown: PIC event, lalu crew yang ditugaskan di event itu. */
+export type PenanggungJawab = Skema['PenanggungJawabDto']
+
 /** Transaksi vendor. `biayaAktual` > 0 berarti transaksi tidak bisa dihapus. */
 export type EventVendor = Skema['EventVendorDto']
 

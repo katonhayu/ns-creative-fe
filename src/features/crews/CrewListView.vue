@@ -2,9 +2,12 @@
 import Column from 'primevue/column'
 import CrudTable from '@/components/CrudTable.vue'
 import { useCrud } from '@/composables/useCrud'
+import { useAuthStore } from '@/stores/auth'
 import { inisial } from '@/utils/format'
 import { crewApi } from './crew.api'
 import CrewForm from './CrewForm.vue'
+
+const auth = useAuthStore()
 
 const crud = useCrud({
   key: 'crews',
@@ -21,6 +24,7 @@ const crud = useCrud({
   <div class="halaman">
     <CrudTable
       :crud="crud"
+      :hanya-lihat="!auth.isAdmin"
       judul="Data Crew"
       placeholder-cari="Cari nama crew atau keahlian…"
       ikon-kosong="pi-users"

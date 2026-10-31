@@ -31,6 +31,12 @@ const props = defineProps<{
   alasanTidakBisaHapus?: (item: T) => string | null
   /** Rute halaman detail. Jika diisi, kolom Aksi mendapat tombol lihat (ikon mata). */
   ruteDetail?: (item: T) => RouteLocationRaw
+  /** Sembunyikan tombol tambah, edit, dan hapus, misalnya untuk event manager. */
+  hanyaLihat?: boolean
+  /** Sembunyikan tombol tambah saja. */
+  tanpaTambah?: boolean
+  /** Baris yang boleh diedit. Kosong = semua baris. */
+  bisaUbah?: (item: T) => boolean
 }>()
 
 defineSlots<{
@@ -41,10 +47,14 @@ defineSlots<{
 }>()
 
 /** Lebar kolom Aksi mengikuti jumlah tombolnya. */
-const lebarAksi = computed(() => {
-  const jumlahTombol = 1 + (props.tanpaHapus ? 0 : 1) + (props.ruteDetail ? 1 : 0)
-  return `${1.5 + jumlahTombol * 2.1}rem`
-})
+const jumlahTombol = computed(() =>
+  props.hanyaLihat
+    ? props.ruteDetail
+      ? 1
+      : 0
+    : 1 + (props.tanpaHapus ? 0 : 1) + (props.ruteDetail ? 1 : 0),
+)
+const lebarAksi = computed(() => `${1.5 + jumlahTombol.value * 2.1}rem`)
 
 const labelTambah = computed(
   () => `Tambah ${props.crud.label.charAt(0).toUpperCase()}${props.crud.label.slice(1)}`,
@@ -91,7 +101,13 @@ const labelTambah = computed(
 
       <slot name="filter" />
 
-      <Button :label="labelTambah" icon="pi pi-plus" class="tambah" @click="crud.bukaTambah()" />
+      <Button
+        v-if="!hanyaLihat && !tanpaTambah"
+        :label="labelTambah"
+        icon="pi pi-plus"
+        class="tambah"
+        @click="crud.bukaTambah()"
+      />
     </div>
 
     <p v-if="crud.search && crud.sudahDimuat" class="info-cari">
@@ -135,6 +151,7 @@ const labelTambah = computed(
             <span class="kosong__ikon"><i class="pi" :class="ikonKosong" /></span>
             <p>{{ pesanKosong }}</p>
             <Button
+              v-if="!hanyaLihat && !tanpaTambah"
               :label="labelTambah"
               icon="pi pi-plus"
               size="small"
@@ -146,7 +163,13 @@ const labelTambah = computed(
 
       <slot />
 
-      <Column header="Aksi" frozen align-frozen="right" :style="{ width: lebarAksi }">
+      <Column
+        v-if="jumlahTombol > 0"
+        header="Aksi"
+        frozen
+        align-frozen="right"
+        :style="{ width: lebarAksi }"
+      >
         <template #body="{ data: item }">
           <div class="aksi">
             <Button
@@ -162,6 +185,7 @@ const labelTambah = computed(
               title="Lihat detail"
             />
             <Button
+              v-if="!hanyaLihat && (bisaUbah?.(item) ?? true)"
               icon="pi pi-pen-to-square"
               text
               rounded
@@ -170,7 +194,10 @@ const labelTambah = computed(
               title="Edit"
               @click="crud.bukaEdit(item)"
             />
-            <span v-if="!tanpaHapus" :title="alasanTidakBisaHapus?.(item) ?? 'Hapus'">
+            <span
+              v-if="!hanyaLihat && !tanpaHapus"
+              :title="alasanTidakBisaHapus?.(item) ?? 'Hapus'"
+            >
               <Button
                 icon="pi pi-trash"
                 text

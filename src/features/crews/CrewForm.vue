@@ -153,7 +153,8 @@ const kirim = handleSubmit(async (values) => {
         Daftar akun gagal dimuat. {{ pesanError(akunCrew.error.value) }}
       </small>
       <small v-else class="bantuan">
-        Tautkan jika crew ini perlu login untuk melihat rundown dan task miliknya.
+        Tautkan jika crew ini perlu login: melihat event tempat ia ditugaskan, mengubah status task
+        miliknya, dan membuat atau menjadi PIC event.
       </small>
     </div>
   </FormDialog>

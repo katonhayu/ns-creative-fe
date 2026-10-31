@@ -13,15 +13,24 @@ import { pesanError } from '@/api/http'
 import { pilihanDari } from '@/features/events/penugasan.types'
 import { useAuthStore } from '@/stores/auth'
 import { listTasks, updateStatusTask } from './task.api'
-import { STATUS_TASK, lewatDeadline, type StatusTask, type TaskRow } from './task.types'
+import {
+  STATUS_TASK,
+  bolehUbahStatus,
+  lewatDeadline,
+  type StatusTask,
+  type TaskRow,
+} from './task.types'
 import TaskTable from './TaskTable.vue'
 
 const auth = useAuthStore()
 const toast = useToast()
 const queryClient = useQueryClient()
 
-/** Crew selalu hanya melihat task miliknya. Admin dan PIC bisa memilih. */
-const hanyaMilikSaya = ref(auth.peran === 'crew')
+/**
+ * "Task saya" = task yang PIC-nya crew milik pengguna, jadi hanya berarti bagi akun yang
+ * ditautkan ke data crew. Untuk mereka saklar ini menyala sejak awal.
+ */
+const hanyaMilikSaya = ref(auth.crewId !== null)
 const kataKunci = ref('')
 type Filter = StatusTask | 'lewat' | 'aktif'
 const filterStatus = ref<Filter | null>('aktif')
@@ -52,10 +61,7 @@ const tampil = computed(() => {
 
 const jumlahLewat = computed(() => (daftar.data.value ?? []).filter((t) => lewatDeadline(t)).length)
 
-/** Crew hanya boleh mengubah status task miliknya. */
-function bisaUbahStatus(t: TaskRow) {
-  return auth.peran !== 'crew' || t.picUserId === auth.user?.id
-}
+const bisaUbahStatus = (t: TaskRow) => bolehUbahStatus(t, auth.crewId)
 
 const mutasiStatus = useMutation({
   mutationFn: ({ t, status }: { t: TaskRow; status: StatusTask }) =>
@@ -85,10 +91,10 @@ const mutasiStatus = useMutation({
   <section class="kartu">
     <div class="kepala">
       <div>
-        <h1>{{ auth.peran === 'crew' ? 'Task Saya' : 'Data Task' }}</h1>
+        <h1>{{ hanyaMilikSaya ? 'Task Saya' : 'Data Task' }}</h1>
         <p>
           {{
-            auth.peran === 'crew'
+            hanyaMilikSaya
               ? 'Tugas yang ditugaskan kepadamu di semua event. Ubah statusnya begitu ada progres.'
               : 'Tugas dari semua event yang bisa kamu akses. Tambah dan edit task dari halaman detail event.'
           }}
@@ -119,7 +125,7 @@ const mutasiStatus = useMutation({
         aria-label="Filter status"
         class="filter-status"
       />
-      <label v-if="auth.peran !== 'crew'" class="saklar">
+      <label v-if="auth.crewId" class="saklar">
         <ToggleSwitch v-model="hanyaMilikSaya" />
         <span>Hanya tugas saya</span>
       </label>
@@ -149,7 +155,7 @@ const mutasiStatus = useMutation({
       <span class="kosong__ikon"><i class="pi pi-check-square" /></span>
       <p v-if="(daftar.data.value ?? []).length === 0">
         {{
-          auth.peran === 'crew'
+          hanyaMilikSaya
             ? 'Belum ada task yang ditugaskan kepadamu.'
             : 'Belum ada task di event yang bisa kamu akses.'
         }}
@@ -161,7 +167,6 @@ const mutasiStatus = useMutation({
       <TaskTable
         :items="tampil"
         tampilkan-event
-        :tautan-event="auth.peran !== 'crew'"
         :bisa-ubah-status="bisaUbahStatus"
         :id-ubah-status="mutasiStatus.isPending.value ? mutasiStatus.variables.value?.t.id : null"
         @ubah-status="(t, status) => mutasiStatus.mutate({ t, status })"
