@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import dayjs from 'dayjs'
 import { RouterLink } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
+import { useToast } from 'primevue/usetoast'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
@@ -15,9 +16,11 @@ import SelectButton from 'primevue/selectbutton'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { pesanError } from '@/api/http'
 import { rentangTanggal, rupiah, tanggal } from '@/utils/format'
-import { listLaporan } from './report.api'
+import { listLaporan, unduhPdfLaporan } from './report.api'
 import type { LaporanRow } from './report.types'
+import RekapPdfDialog from './RekapPdfDialog.vue'
 
+const toast = useToast()
 const daftar = useQuery({ queryKey: ['reports'], queryFn: listLaporan })
 const semua = computed(() => daftar.data.value ?? [])
 
@@ -55,6 +58,28 @@ const tampil = computed(() => {
 const totalPengeluaran = computed(() =>
   tampil.value.reduce((s, r) => s + (r.laporan?.totalPengeluaran ?? 0), 0),
 )
+
+// --- Unduh PDF ---------------------------------------------------------------
+
+/** Periode dan status rekap dipilih di dialog; nilai awalnya dari filter halaman ini. */
+const dialogRekap = ref(false)
+
+const idDiunduh = ref<string | null>(null)
+async function unduhLaporan(r: LaporanRow) {
+  idDiunduh.value = r.eventId
+  try {
+    await unduhPdfLaporan(r.eventId, r.namaEvent)
+  } catch (error) {
+    toast.add({
+      severity: 'error',
+      summary: `PDF laporan ${r.namaEvent} gagal dibuat`,
+      detail: pesanError(error),
+      life: 5000,
+    })
+  } finally {
+    idDiunduh.value = null
+  }
+}
 
 const ruteLaporan = (r: LaporanRow) => ({
   name: 'event-detail',
@@ -102,6 +127,15 @@ const ruteLaporan = (r: LaporanRow) => ({
           fluid
         />
       </IconField>
+      <Button
+        label="Unduh rekap PDF"
+        icon="pi pi-file-pdf"
+        outlined
+        class="unduh-rekap"
+        :disabled="!semua.length"
+        title="Pilih periode lalu unduh rekap event selesai"
+        @click="dialogRekap = true"
+      />
     </div>
 
     <Message v-if="daftar.isError.value" severity="error" :closable="false">
@@ -198,18 +232,29 @@ const ruteLaporan = (r: LaporanRow) => ({
         </Column>
         <Column header="Aksi" frozen align-frozen="right" style="width: 7rem">
           <template #body="{ data: r }">
-            <Button
-              v-if="r.laporan"
-              :as="RouterLink"
-              :to="ruteLaporan(r)"
-              icon="pi pi-eye"
-              text
-              rounded
-              severity="secondary"
-              size="small"
-              :aria-label="`Lihat laporan ${r.namaEvent}`"
-              title="Lihat laporan"
-            />
+            <div v-if="r.laporan" class="aksi">
+              <Button
+                :as="RouterLink"
+                :to="ruteLaporan(r)"
+                icon="pi pi-eye"
+                text
+                rounded
+                severity="secondary"
+                size="small"
+                :aria-label="`Lihat laporan ${r.namaEvent}`"
+                title="Lihat laporan"
+              />
+              <Button
+                icon="pi pi-file-pdf"
+                text
+                rounded
+                size="small"
+                :aria-label="`Unduh PDF laporan ${r.namaEvent}`"
+                title="Unduh PDF"
+                :loading="idDiunduh === r.eventId"
+                @click="unduhLaporan(r)"
+              />
+            </div>
             <Button
               v-else
               :as="RouterLink"
@@ -230,6 +275,13 @@ const ruteLaporan = (r: LaporanRow) => ({
         <span class="sel-redup">(hanya event yang laporannya sudah dibuat)</span>
       </p>
     </template>
+
+    <RekapPdfDialog
+      v-model:visible="dialogRekap"
+      :laporan="semua"
+      :tahun-awal="filterTahun"
+      :status-awal="filterStatus"
+    />
   </section>
 </template>
 
@@ -280,6 +332,10 @@ const ruteLaporan = (r: LaporanRow) => ({
 }
 .filter-tahun {
   width: 10rem;
+}
+.aksi {
+  display: flex;
+  gap: 0.1rem;
 }
 .cari {
   flex: 1 1 220px;
@@ -369,7 +425,8 @@ const ruteLaporan = (r: LaporanRow) => ({
     padding: 1rem;
   }
   .filter-tahun,
-  .cari {
+  .cari,
+  .unduh-rekap {
     width: 100%;
     max-width: none;
     margin-left: 0;

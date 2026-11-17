@@ -8,7 +8,12 @@ import Button from 'primevue/button'
 import Message from 'primevue/message'
 import Textarea from 'primevue/textarea'
 import { errorPerField, pesanError } from '@/api/http'
-import { buatLaporan, getLaporan, updateLaporan } from '@/features/reports/report.api'
+import {
+  buatLaporan,
+  getLaporan,
+  unduhPdfLaporan,
+  updateLaporan,
+} from '@/features/reports/report.api'
 import {
   laporanSchema,
   type LaporanFormValues,
@@ -36,6 +41,24 @@ const ringkasan = useQuery({
 
 const sudahSelesai = computed(() => props.event.status === 'selesai')
 const data = computed(() => laporan.data.value ?? null)
+
+// PDF pertanggungjawaban: semua yang bisa membuka event boleh mengunduhnya.
+const sedangUnduh = ref(false)
+async function unduhPdf() {
+  sedangUnduh.value = true
+  try {
+    await unduhPdfLaporan(props.event.id, props.event.nama)
+  } catch (error) {
+    toast.add({
+      severity: 'error',
+      summary: 'PDF laporan gagal dibuat',
+      detail: pesanError(error),
+      life: 5000,
+    })
+  } finally {
+    sedangUnduh.value = false
+  }
+}
 
 /** Angka yang ditarik otomatis dari modul lain. */
 const angka = computed(() => {
@@ -147,13 +170,22 @@ const tampilForm = computed(
         <h2>Laporan</h2>
         <p>Evaluasi pelaksanaan event. Angka total ditarik otomatis dari budget dan task.</p>
       </div>
-      <Button
-        v-if="data && !modeEdit && sudahSelesai && event.bolehKelola"
-        label="Edit laporan"
-        icon="pi pi-pen-to-square"
-        outlined
-        @click="mulaiEdit"
-      />
+      <div v-if="data && !modeEdit" class="kepala__aksi">
+        <Button
+          label="Unduh PDF"
+          icon="pi pi-file-pdf"
+          outlined
+          :loading="sedangUnduh"
+          @click="unduhPdf"
+        />
+        <Button
+          v-if="sudahSelesai && event.bolehKelola"
+          label="Edit laporan"
+          icon="pi pi-pen-to-square"
+          outlined
+          @click="mulaiEdit"
+        />
+      </div>
     </header>
 
     <!-- Loading & error -->
@@ -387,6 +419,11 @@ const tampilForm = computed(
   align-items: flex-end;
   justify-content: space-between;
   gap: 0.75rem 1.5rem;
+}
+.kepala__aksi {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 .kepala h2 {
   margin: 0;

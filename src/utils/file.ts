@@ -17,6 +17,18 @@ export function tanpaEkstensi(namaFile: string) {
   return (i > 0 ? namaFile.slice(0, i) : namaFile).replace(/[_-]+/g, ' ').trim()
 }
 
+/**
+ * Nama file dari header Content-Disposition. `filename*` (UTF-8) didahulukan karena bisa memuat
+ * karakter non-ASCII. Null jika header kosong atau tidak punya nama file.
+ */
+export function namaFileDariHeader(header: string | null | undefined) {
+  if (!header) return null
+  const utf8 = /filename\*=UTF-8''([^;]+)/i.exec(header)
+  if (utf8?.[1]) return decodeURIComponent(utf8[1])
+  const biasa = /filename="?([^";]+)"?/i.exec(header)
+  return biasa?.[1] ?? null
+}
+
 /** Simpan blob sebagai file lewat unduhan browser. */
 export function simpanBlob(blob: Blob, namaFile: string) {
   const url = URL.createObjectURL(blob)
