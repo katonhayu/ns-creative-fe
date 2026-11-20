@@ -52,11 +52,11 @@ const GRUP_MENU: GrupMenu[] = [
   {
     judul: 'Data Master',
     item: [
-      { nama: 'clients', label: 'Client', ikon: 'pi-user' },
-      { nama: 'talents', label: 'Talent', ikon: 'pi-star' },
-      { nama: 'crews', label: 'Crew', ikon: 'pi-users' },
-      { nama: 'vendors', label: 'Vendor', ikon: 'pi-truck' },
-      { nama: 'users', label: 'Pengguna', ikon: 'pi-id-card' },
+      { nama: 'clients', label: 'Master Data Client', ikon: 'pi-user' },
+      { nama: 'talents', label: 'Master Data Talent', ikon: 'pi-star' },
+      { nama: 'crews', label: 'Master Data Crew', ikon: 'pi-users' },
+      { nama: 'vendors', label: 'Master Data Vendor', ikon: 'pi-truck' },
+      { nama: 'users', label: 'Master Data Pengguna', ikon: 'pi-id-card' },
     ],
   },
 ]
